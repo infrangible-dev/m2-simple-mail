@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<!--
+ * @author      Andreas Knollmann
+ * @copyright   2014-2024 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="infrangible_simple_mail" translate="label" type="text" sortOrder="1100" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Simple Mail</label>
+            <tab>infrangible</tab>
+            <resource>Infrangible_SimpleMail::config_infrangible_simple_mail</resource>
+            <group id="test_mail" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Test Mail</label>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="receiver" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Receiver</label>
+                </field>
+                <field id="send" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Test Mail</label>
+                    <button_label>Send</button_label>
+                    <button_url>simple_mail/mail/test</button_url>
+                    <attribute type="data_html_ids">infrangible_simple_mail_test_mail_sender,infrangible_simple_mail_test_mail_receiver</attribute>
+                    <frontend_model>Infrangible\Core\Block\Adminhtml\System\Config\Form\AjaxButton</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
