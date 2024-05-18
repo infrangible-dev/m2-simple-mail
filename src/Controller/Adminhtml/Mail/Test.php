@@ -66,6 +66,7 @@ class Test
         $mail->setType($type);
         $mail->setSubject($subject);
         $mail->setBody($body);
+        $mail->addAdditionalHeader('X-Sender', 'Test Mail');
 
         try {
             $mail->send();

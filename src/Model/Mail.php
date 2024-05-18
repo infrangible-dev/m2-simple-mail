@@ -6,7 +6,6 @@ namespace Infrangible\SimpleMail\Model;
 
 use Magento\Framework\Exception\MailException;
 use Magento\Framework\Mail\AddressConverter;
-use Magento\Framework\Mail\EmailMessageInterfaceFactory;
 use Magento\Framework\Mail\MimeMessageInterfaceFactory;
 use Magento\Framework\Mail\MimePartInterfaceFactory;
 use Magento\Framework\Mail\TransportInterfaceFactory;
@@ -24,14 +23,17 @@ class Mail
     /** @var MimeMessageInterfaceFactory */
     protected $mimeMessageInterfaceFactory;
 
-    /** @var EmailMessageInterfaceFactory */
-    protected $emailMessageInterfaceFactory;
+    /** @var EmailMessageFactory */
+    protected $emailMessageFactory;
 
     /** @var TransportInterfaceFactory */
     protected $mailTransportFactory;
 
     /** @var AddressConverter */
     protected $addressConverter;
+
+    /** @var array */
+    private $additionalHeaders = [];
 
     /** @var array */
     private $senders = [];
@@ -55,24 +57,49 @@ class Mail
     private $body;
 
     /**
-     * @param MimePartInterfaceFactory     $mimePartInterfaceFactory
-     * @param MimeMessageInterfaceFactory  $mimeMessageInterfaceFactory
-     * @param EmailMessageInterfaceFactory $emailMessageInterfaceFactory
-     * @param TransportInterfaceFactory    $mailTransportFactory
-     * @param AddressConverter             $addressConverter
+     * @param MimePartInterfaceFactory    $mimePartInterfaceFactory
+     * @param MimeMessageInterfaceFactory $mimeMessageInterfaceFactory
+     * @param EmailMessageFactory         $emailMessageFactory
+     * @param TransportInterfaceFactory   $mailTransportFactory
+     * @param AddressConverter            $addressConverter
      */
     public function __construct(
         MimePartInterfaceFactory $mimePartInterfaceFactory,
         MimeMessageInterfaceFactory $mimeMessageInterfaceFactory,
-        EmailMessageInterfaceFactory $emailMessageInterfaceFactory,
+        EmailMessageFactory $emailMessageFactory,
         TransportInterfaceFactory $mailTransportFactory,
-        AddressConverter $addressConverter)
-    {
+        AddressConverter $addressConverter
+    ) {
         $this->mimePartInterfaceFactory = $mimePartInterfaceFactory;
         $this->mimeMessageInterfaceFactory = $mimeMessageInterfaceFactory;
-        $this->emailMessageInterfaceFactory = $emailMessageInterfaceFactory;
+        $this->emailMessageFactory = $emailMessageFactory;
         $this->mailTransportFactory = $mailTransportFactory;
         $this->addressConverter = $addressConverter;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdditionalHeaders(): array
+    {
+        return $this->additionalHeaders;
+    }
+
+    /**
+     * @param array $additionalHeaders
+     */
+    public function setAdditionalHeaders(array $additionalHeaders): void
+    {
+        $this->additionalHeaders = $additionalHeaders;
+    }
+
+    /**
+     * @param string      $headerName
+     * @param string|null $headerValue
+     */
+    public function addAdditionalHeader(string $headerName, ?string $headerValue = null)
+    {
+        $this->additionalHeaders[$headerName] = $headerValue;
     }
 
     /**
@@ -97,7 +124,7 @@ class Mail
      */
     public function addSender(string $senderEMail, ?string $senderName = null)
     {
-        $this->senders[ $senderEMail ] = $senderName;
+        $this->senders[$senderEMail] = $senderName;
     }
 
     /**
@@ -122,7 +149,7 @@ class Mail
      */
     public function addReceiver(string $receiverEMail, ?string $receiverName = null)
     {
-        $this->receivers[ $receiverEMail ] = $receiverName;
+        $this->receivers[$receiverEMail] = $receiverName;
     }
 
     /**
@@ -147,7 +174,7 @@ class Mail
      */
     public function addCopyReceiver(string $receiverEMail, ?string $receiverName = null)
     {
-        $this->copyReceivers[ $receiverEMail ] = $receiverName;
+        $this->copyReceivers[$receiverEMail] = $receiverName;
     }
 
     /**
@@ -172,7 +199,7 @@ class Mail
      */
     public function addBlindCopyReceiver(string $receiverEMail, ?string $receiverName = null)
     {
-        $this->blindCopyReceivers[ $receiverEMail ] = $receiverName;
+        $this->blindCopyReceivers[$receiverEMail] = $receiverName;
     }
 
     /**
@@ -248,10 +275,8 @@ class Mail
             $blindCopyReceivers[] = $this->addressConverter->convert($receiverEMail, $receiverName);
         }
 
-        $mimePart = $this->mimePartInterfaceFactory->create([
-            'content' => $this->getBody(),
-            'type'    => $this->getType()
-        ]);
+        $mimePart =
+            $this->mimePartInterfaceFactory->create(['content' => $this->getBody(), 'type' => $this->getType()]);
 
         $messageData = [
             'from'     => $senders,
@@ -263,7 +288,11 @@ class Mail
             'body'     => $this->mimeMessageInterfaceFactory->create(['parts' => [$mimePart]])
         ];
 
-        $message = $this->emailMessageInterfaceFactory->create($messageData);
+        $message = $this->emailMessageFactory->create($messageData);
+
+        foreach ($this->getAdditionalHeaders() as $headerName => $headerValue) {
+            $message->addHeaderLine($headerName, $headerValue);
+        }
 
         $mailTransport = $this->mailTransportFactory->create(['message' => clone $message]);
 
