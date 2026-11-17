@@ -6,8 +6,8 @@
 
 - Requires Magento 2.4.6 or newer and PHP 8.2 or newer. Magento 2.3 to 2.4.5 and PHP 7.1 to 8.1 are no longer
   supported; use version 1.x for these.
-- Requires `infrangible/m2-core` 5.0, `infrangible/m2-foundation` 3.0, `fewedev/base` 2.4, `magento/module-backend`
-  and `magento/module-config`.
+- Requires `infrangible/m2-core` 5.0, `infrangible/m2-foundation` 3.0, `fewedev/base` 2.4, `magento/module-backend`,
+  `magento/module-config` and the PHP extension `filter`.
 - All methods of the mail have native return types, and the constructors use constructor property promotion. The
   controller of the test mail gets the sender identities of the store
   (`Magento\Config\Model\Config\Source\Email\Identity`).
