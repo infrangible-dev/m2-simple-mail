@@ -60,6 +60,22 @@ class MailTest extends TestCase
     private EmailMessage $message;
 
     /**
+     * Creates the message, which records the headers that are added.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $message = $this->createStub(EmailMessage::class);
+        $message->method('addHeaderLine')->willReturnCallback(
+            function (string $name, ?string $value = null): void {
+                $this->headers[] = [$name, $value];
+            }
+        );
+        $this->message = $message;
+    }
+
+    /**
      * Returns a mail whose factories record what they get.
      *
      * @return Mail
@@ -81,13 +97,7 @@ class MailTest extends TestCase
         $mimeMessageFactory = $this->createStub(MimeMessageInterfaceFactory::class);
         $mimeMessageFactory->method('create')->willReturn($this->createStub(MimeMessageInterface::class));
 
-        $message = $this->createStub(EmailMessage::class);
-        $message->method('addHeaderLine')->willReturnCallback(
-            function (string $name, ?string $value = null): void {
-                $this->headers[] = [$name, $value];
-            }
-        );
-        $this->message = $message;
+        $message = $this->message;
 
         $messageFactory = $this->createStub(EmailMessageFactory::class);
         $messageFactory->method('create')->willReturnCallback(
