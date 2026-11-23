@@ -97,14 +97,12 @@ class MailTest extends TestCase
         $mimeMessageFactory = $this->createStub(MimeMessageInterfaceFactory::class);
         $mimeMessageFactory->method('create')->willReturn($this->createStub(MimeMessageInterface::class));
 
-        $message = $this->message;
-
         $messageFactory = $this->createStub(EmailMessageFactory::class);
         $messageFactory->method('create')->willReturnCallback(
-            function (array $data) use ($message): EmailMessage {
+            function (array $data): EmailMessage {
                 $this->messageData = $data;
 
-                return $message;
+                return $this->message;
             }
         );
 
