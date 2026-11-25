@@ -1,11 +1,14 @@
 {
     "name": "infrangible/m2-simple-mail",
-    "description": "Infrangible Magento 2 Simple Mail",
+    "description": "Lets Infrangible modules send plain emails, such as task reports, through the store's mail setup, and adds a test mail button to the admin.",
     "type": "magento2-module",
     "version": "2.0.0",
     "license": "MIT",
     "keywords": [
-        "Magento"
+        "Magento",
+        "Magento 2",
+        "Adobe Commerce",
+        "Email"
     ],
     "homepage": "https://www.infrangible.dev/modules/simple-mail",
     "authors": [
